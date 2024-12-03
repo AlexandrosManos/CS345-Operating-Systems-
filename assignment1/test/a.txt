@@ -1,0 +1,35 @@
+/*For globals*/
+            else if (strchr(split_inp[0], '=') != NULL)
+            {
+                create_global(input);
+            }
+/*Echo command*/
+else if (strncmp(split_inp[0], "echo", 4) == 0)
+            {
+                redir_echo = 0;
+                i = 1;
+                while (split_inp[i] != NULL)
+                {
+                    if (strncmp(split_inp[i], ">", 1) == 0 || strcmp(split_inp[i], "<") == 0)
+                    {
+                        redir_echo = 1;
+                        break;
+                    }
+                    i++;
+                } /*Echo contains redirect symbol*/
+                if (redir_echo == 1)
+                {
+                    echo_with_redir(split_inp);
+                }
+                else /*Normal echo */
+                {
+                    i = 1;
+                    while (split_inp[i] != NULL)
+                    {
+                        echo(split_inp[i]);
+                        i++;
+                    }
+                }
+
+                printf("\n");
+            }

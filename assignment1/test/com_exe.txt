@@ -1,0 +1,118 @@
+int command_exe(char **cmd)
+{
+    int fin = -1, fout = -1, i, redir_echo;
+    if (strncmp(cmd[0], "echo", 4) == 0)
+    {
+        redir_echo = 0;
+        i = 1;
+        while (cmd[i] != NULL)
+        {
+            if (strncmp(cmd[i], ">", 1) == 0 || strcmp(cmd[i], "<") == 0)
+            {
+                redir_echo = 1;
+                break;
+            }
+            i++;
+        } /*Echo contains redirect symbol*/
+        if (redir_echo == 1)
+        {
+        }
+        else /*Normal echo */
+        {
+        }
+        i = 1;
+        while (cmd[i] != NULL)
+        {
+            printf("CMD[%d] = <%s>\n", i, cmd[i]);
+            if (strncmp(cmd[i], ">", 1) != 0)
+            {
+                buffed_Echo(cmd[i]);
+            }
+            else
+            {
+                printf("strncmp(cmd[i], >, 1) == 0\n");
+            }
+            i++;
+        }
+    }
+    for (i = 0; cmd[i] != NULL; i++)
+    {
+        /* There is no such a command with double "<" */
+        if (strcmp(cmd[i], "<") == 0)
+        {
+            printf("Redirecting < \n");
+            cmd[i++] = NULL;
+            fin = open(cmd[i], O_RDONLY);
+            if (fin < 0)
+            {
+                perror("Could not open the input file");
+                return -1;
+            }
+            /* Redirect stdin */
+            dup2(fin, STDIN_FILENO);
+            close(fin);
+        } /* Using strncmp in case of double redirection */
+        else if (strncmp(cmd[i], ">", 1) == 0)
+        {
+            if (strcmp(cmd[i], ">") == 0)
+            {
+                /*O_TRUNC --> Overwrite*/
+                /*rw for user, r for group and others*/
+                fout = open(cmd[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            }
+            else
+            {
+                fout = open(cmd[i + 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+            }
+            cmd[i++] = NULL;
+            if (fout < 0)
+            {
+                perror("Could not open the output file");
+                return -1;
+            }
+            /* Rediracting stdout */
+            dup2(fout, STDOUT_FILENO);
+            close(fout);
+        }
+    }
+
+    /* Execute the command */
+    if (execvp(cmd[0], cmd) == -1)
+    {
+        perror("Unknown command");
+        return -1;
+    }
+    return 1; /*Success*/
+}
+
+
+void echo(char *input)
+{
+    char output[LINE_SIZE] = "";
+    char *token = strtok(input, " $");
+    char *value;
+    if (input[0] == '$')
+    {
+
+        while (token != NULL)
+        {
+            value = getenv(token);
+            if (value != NULL)
+            {
+                strcat(output, value);
+            }
+            else
+            {
+                /* Concatenates the token and the output */
+                strcat(output, token);
+            }
+            token = strtok(NULL, " $");
+        }
+    }
+    else
+    {
+        strcat(output, input);
+    }
+    /* Print the global variable */
+    printf("Output = %s \n", output);
+}

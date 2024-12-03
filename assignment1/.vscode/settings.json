@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "string.h": "c",
+        "assert.h": "c",
+        "unistd.h": "c",
+        "limits": "c",
+        "type_traits": "c",
+        "fcntl.h": "c",
+        "execution.h": "c",
+        "types.h": "c",
+        "stdio.h": "c",
+        "input_output.h": "c",
+        "global_var.h": "c"
+    }
+}
